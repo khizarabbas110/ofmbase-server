@@ -5,8 +5,9 @@ import path from "path";
 import bodyParser from "body-parser";
 import connectDB from "./config/db.js";
 import os from "os";
+import fs from "fs";
 import { Server } from "socket.io";
-import http from "http";
+import https from "https"; // ✅ Changed from http to https
 
 import compression from "compression";
 import { EventEmitter } from "events";
@@ -30,14 +31,19 @@ import invoiceRouter from "./routes/invoice.js";
 import documentTabRouter from "./routes/documents/tabs.js";
 import adminRouter from "./routes/admin.js";
 import subscriptionsRouter from "./routes/subscriptions.js";
+import adminDocumentRouter from "./routes/adminDocuments.js";
 
 // Raise the max listeners limit
 EventEmitter.defaultMaxListeners = 30;
 process.setMaxListeners(30);
 
+const sslOptions = {
+  key: fs.readFileSync(path.resolve("certs/key.pem")),
+  cert: fs.readFileSync(path.resolve("certs/cert.pem")),
+};
 // App setup
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(sslOptions, app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
@@ -104,6 +110,7 @@ app.use("/api/document/tabs", documentTabRouter);
 app.use("/api/subscriptions", subscriptionsRouter);
 //Finally admin routes
 app.use("/api/admin", adminRouter);
+app.use("/api/admin/documents", adminDocumentRouter);
 
 // Helper to get local IP
 const getLocalIPAddress = () => {
@@ -121,7 +128,7 @@ const localIP = getLocalIPAddress();
 
 // Start HTTP server
 server.listen(port, "0.0.0.0", () => {
-  console.log(`Server is running on:`);
-  console.log(`➡ Local:   http://localhost:${port}`);
-  console.log(`➡ Network: http://${localIP}:${port}`);
+  console.log(`✅ HTTPS Server is running on:`);
+  console.log(`➡ Local:   https://localhost:${port}`);
+  console.log(`➡ Network: https://${localIP}:${port}`);
 });
