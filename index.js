@@ -38,9 +38,12 @@ EventEmitter.defaultMaxListeners = 30;
 process.setMaxListeners(30);
 
 const sslOptions = {
-  key: fs.readFileSync(path.resolve("certs/key.pem")),
-  cert: fs.readFileSync(path.resolve("certs/cert.pem")),
+  key: fs.readFileSync("/etc/letsencrypt/live/backend.ofmbase.com/privkey.pem"),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/backend.ofmbase.com/fullchain.pem"
+  ),
 };
+
 // App setup
 const app = express();
 const server = https.createServer(sslOptions, app);
