@@ -83,7 +83,9 @@ connectDB();
 
 // Simple test route
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send(
+    "Server is running/listening on this url: https://backend.ofmbase.com"
+  );
 });
 
 // API routes
