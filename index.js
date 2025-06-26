@@ -130,8 +130,7 @@ const getLocalIPAddress = () => {
 const localIP = getLocalIPAddress();
 
 // Start HTTP server
-server.listen(port, "0.0.0.0", () => {
-  console.log(`✅ HTTPS Server is running on:`);
-  console.log(`➡ Local:   https://localhost:${port}`);
-  console.log(`➡ Network: https://${localIP}:${port}`);
+server.listen(443, "0.0.0.0", () => {
+  console.log(`✅ HTTPS Server is running on https://backend.ofmbase.com`);
 });
+
