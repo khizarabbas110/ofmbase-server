@@ -8,7 +8,13 @@ import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
 import https from "https"; // ✅ Changed from http to https
+//
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+//
 import compression from "compression";
 import { EventEmitter } from "events";
 
@@ -32,6 +38,7 @@ import documentTabRouter from "./routes/documents/tabs.js";
 import adminRouter from "./routes/admin.js";
 import subscriptionsRouter from "./routes/subscriptions.js";
 import adminDocumentRouter from "./routes/adminDocuments.js";
+import emailTemplateRouter from "./routes/emailTemplate.js";
 
 // Raise the max listeners limit
 EventEmitter.defaultMaxListeners = 30;
@@ -43,6 +50,11 @@ const sslOptions = {
     "/etc/letsencrypt/live/backend.ofmbase.com/fullchain.pem"
   ),
 };
+
+// const sslOptions = {
+//   key: fs.readFileSync(path.join(__dirname, "certs", "key.pem")),
+//   cert: fs.readFileSync(path.join(__dirname, "certs", "cert.pem")),
+// };
 
 // App setup
 const app = express();
@@ -114,6 +126,7 @@ app.use("/api/subscriptions", subscriptionsRouter);
 //Finally admin routes
 app.use("/api/admin", adminRouter);
 app.use("/api/admin/documents", adminDocumentRouter);
+app.use("/api/admin/templates", emailTemplateRouter);
 
 // Helper to get local IP
 const getLocalIPAddress = () => {
