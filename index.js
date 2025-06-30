@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
-import https from "https"; // ✅ Changed from http to https
+import https from "https";
 //
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -143,6 +143,6 @@ const getLocalIPAddress = () => {
 const localIP = getLocalIPAddress();
 
 // Start HTTP server
-server.listen(5000, "0.0.0.0", () => {
-  console.log("✅ HTTP Server running on http://localhost:5000");
+server.listen(443, "0.0.0.0", () => {
+  console.log("✅ HTTPS Server running on https://backend.ofmbase.com");
 });
