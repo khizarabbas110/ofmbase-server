@@ -143,6 +143,6 @@ const getLocalIPAddress = () => {
 const localIP = getLocalIPAddress();
 
 // Start HTTP server
-server.listen(443, "0.0.0.0", () => {
-  console.log(`✅ HTTPS Server is running on https://backend.ofmbase.com`);
+server.listen(5000, "0.0.0.0", () => {
+  console.log("✅ HTTP Server running on http://localhost:5000");
 });
