@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
-import https from "https";
+import http from "http"; // ✅ Instead of https
 //
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -58,7 +58,7 @@ const sslOptions = {
 
 // App setup
 const app = express();
-const server = https.createServer(sslOptions, app);
+const server = http.createServer(app); // ✅ Not https.createServer
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
@@ -144,5 +144,5 @@ const localIP = getLocalIPAddress();
 
 // Start HTTP server
 server.listen(5000, "0.0.0.0", () => {
-  console.log("✅ HTTPS Server running behind Nginx on port 5000");
+  console.log("✅ HTTP server running on http://localhost:5000");
 });
