@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
-import https from "http"; // ✅ Instead of https
+import https from "https"; // ✅ CORRECT: you're using SSL certs
 //
 import { dirname } from "path";
 import { fileURLToPath } from "url";
