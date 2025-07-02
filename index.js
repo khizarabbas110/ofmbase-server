@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
-import http from "http"; // ✅ Instead of https
+import https from "http"; // ✅ Instead of https
 //
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -58,7 +58,7 @@ const sslOptions = {
 
 // App setup
 const app = express();
-const server = http.createServer(app); // ✅ Not https.createServer
+const server = https.createServer(sslOptions, app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,

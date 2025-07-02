@@ -9,7 +9,7 @@ import crypto from "crypto";
 import CreaterModal from "../models/creator.js";
 import employeeModel from "../models/employee.js";
 import RoleModel from "../models/role.js";
-import {transporter} from "../utils/transporter.js"; // Import the transporter from utils
+import { transporter } from "../utils/transporter.js"; // Import the transporter from utils
 //
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Make sure this key is defined in your .env
@@ -77,7 +77,7 @@ export const registerUser = async (req, res) => {
     const html = buildVerificationEmail(link);
 
     // 5) Kick off the email send but don’t await it
-     await transporter
+    await transporter
       .sendMail({
         from: "info@ofmbase.com",
         to: email,
@@ -291,7 +291,6 @@ export const loginUser = async (req, res) => {
     });
   }
 };
-
 
 export const forgotPassword = async (req, res) => {
   try {
