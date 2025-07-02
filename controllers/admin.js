@@ -110,7 +110,7 @@ export const addUserByAdmin = async (req, res) => {
     // 5) Kick off the email send but don’t await it
     transporter
       .sendMail({
-        from: `"ofmbase" <${process.env.EMAIL_USER}>`,
+        from: "info@ofmbase.com",
         to: email,
         subject: "Verify Your Email",
         html,

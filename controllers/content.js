@@ -70,7 +70,7 @@ export const CreateAndUploadContent = async (req, res) => {
     if (existingCreator) {
       transporter
         .sendMail({
-          from: process.env.EMAIL_USER,
+          from: "info@ofmbase.com",
           to: existingUser.email,
           subject: `Content uploaded by ${existingCreator.name}`, // Subject line
           text: `Hello ${

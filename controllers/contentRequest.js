@@ -94,7 +94,7 @@ export const createContentRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -242,7 +242,7 @@ export const deleteRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -324,7 +324,7 @@ export const updateRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -441,7 +441,7 @@ export const uploadContentToRequest = async (req, res) => {
 
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingUser.email,
         subject: `Content uploaded by ${existingCreator.name}`, // Subject line
         text: `Hello ${

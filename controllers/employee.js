@@ -84,16 +84,31 @@ export const createEmployee = async (req, res) => {
     });
 
     await newUser.save();
-    transporter
+    await transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: '"OFMBase" <info@ofmbase.com>',
         to: newUser.email,
-        subject: "Welcome to the Creator Platform", // Subject line
-        text: `Hello ${newEmployee.name},\n\nYour account has been successfully created as a Employee.\n\nYour login details are:\nEmail: ${newUser.email}\nPassword: ${password}\n\nPlease keep your password secure.\n\nBest Regards,\nThe Team`, // Email body
+        subject: "Welcome to the Creator Platform",
+        text: `Hello ${newEmployee.name},\n\nYour account has been successfully created as an Employee.\n\nYour login details are:\nEmail: ${newUser.email}\nPassword: ${password}\n\nPlease keep your password secure.\n\nBest Regards,\nThe Team`,
+        html: `
+        <p>Hello ${newEmployee.name},</p>
+        <p>Your account has been successfully created as an Employee.</p>
+        <p><strong>Login Details:</strong></p>
+        <ul>
+          <li><strong>Email:</strong> ${newUser.email}</li>
+          <li><strong>Password:</strong> ${password}</li>
+        </ul>
+        <p>Please keep your password secure.</p>
+        <p>Best Regards,<br/>The Team</p>
+      `,
       })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
+      .then((info) => {
+        console.log("✅ Email sent successfully:", info.response);
+      })
+      .catch((error) => {
+        console.error("❌ Failed to send email:", error);
       });
+
     // 7. Return the response
     return res.status(201).json({
       message: "Employee created successfully",

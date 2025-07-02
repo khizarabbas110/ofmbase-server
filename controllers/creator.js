@@ -85,7 +85,7 @@ export const createCreator = async (req, res) => {
     await newUser.save();
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: newUser.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${newCreator.name},\n\nYour account has been successfully created as a Creator.\n\nYour login details are:\nEmail: ${newUser.email}\nPassword: ${password}\n\nPlease keep your password secure.\n\nBest Regards,\nThe Team`, // Email body

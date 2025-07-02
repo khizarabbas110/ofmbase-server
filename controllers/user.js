@@ -78,7 +78,7 @@ export const registerUser = async (req, res) => {
     // 5) Kick off the email send but don’t await it
     transporter
       .sendMail({
-        from: `"ofmbase" <${process.env.EMAIL_USER}>`,
+        from: "info@ofmbase.com",
         to: email,
         subject: "Verify Your Email",
         html,
@@ -293,10 +293,12 @@ export const loginUser = async (req, res) => {
 
 // Transporter for sending emails
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  host: "smtp.hostinger.com",
+  port: 465, // Use 587 if 465 doesn't work (465 is for SSL)
+  secure: true, // true for 465, false for 587
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail
-    pass: process.env.EMAIL_PASS, // Your Gmail App Password
+    user: "info@ofmbase.com",
+    pass: "Info123!!**",
   },
 });
 
@@ -325,7 +327,7 @@ export const forgotPassword = async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: "info@ofmbase.com",
       to: user.email,
       subject: "Password Reset Request",
       html: `

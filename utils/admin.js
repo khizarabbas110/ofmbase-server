@@ -22,9 +22,11 @@ export function buildVerificationEmail(name, email, password) {
 }
 // Transporter for sending emails
 export const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  host: "smtp.hostinger.com",
+  port: 465, // Use 587 if 465 doesn't work (465 is for SSL)
+  secure: true, // true for 465, false for 587
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail
-    pass: process.env.EMAIL_PASS, // Your Gmail App Password
+    user: "info@ofmbase.com",
+    pass: "Info123!!**",
   },
 });

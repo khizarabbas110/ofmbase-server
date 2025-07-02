@@ -38,7 +38,7 @@ export const createTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingEmployee.email,
         subject: "New Task Assigned", // Subject line
         text: `Hello ${
@@ -145,7 +145,7 @@ export const updateTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingEmployee.email,
         subject: "Task Updated", // Subject line
         text: `Hello ${
@@ -204,7 +204,7 @@ export const deleteTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: process.env.EMAIL_USER,
+        from: "info@ofmbase.com",
         to: existingEmployee.email,
         subject: "A Task removed", // Subject line
         text: `Hello ${
