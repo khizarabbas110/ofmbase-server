@@ -1,11 +1,12 @@
 import nodemailer from "nodemailer";
+import "dotenv/config"; // ensure dotenv is loaded
 
 export const transporter = nodemailer.createTransport({
   host: "smtp.hostinger.com",
-  port: 465, // Use 587 if 465 doesn't work (465 is for SSL)
-  secure: true, // true for 465, false for 587
+  port: 465, // or 587 if needed
+  secure: true,
   auth: {
-    user: "info@ofmbase.com",
-    pass: "Info123!!**",
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
