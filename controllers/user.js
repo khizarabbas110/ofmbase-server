@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
   try {
     const { email, password, method } = req.body;
 
-    // Basic validation
+    // 1. Basic Validation
     if (!email || !password || !method) {
       return res.status(400).json({
         success: false,
@@ -49,7 +49,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 1) Check for an existing verified user
+    // 2. Check for Existing User
     const existing = await userModel.findOne({ email }).lean();
     if (existing?.isVerified) {
       return res.status(400).json({
@@ -58,7 +58,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 2) Create a new user or reuse the unverified one
+    // 3. Create New or Reuse Unverified User
     let user;
     if (existing) {
       user = existing;
@@ -73,13 +73,15 @@ export const registerUser = async (req, res) => {
       });
 
       if (!user) {
-        throw new Error("Failed to create new user.");
+        return res.status(500).json({
+          success: false,
+          message: "Failed to create new user.",
+        });
       }
     }
 
-    // 3) Generate a token
+    // 4. Generate Verification Token
     const tokenString = crypto.randomBytes(32).toString("hex");
-
     const tokenResult = await TokenModel.findOneAndUpdate(
       { userId: user._id },
       {
@@ -90,26 +92,43 @@ export const registerUser = async (req, res) => {
     );
 
     if (!tokenResult) {
-      throw new Error("Failed to generate or update verification token.");
+      return res.status(500).json({
+        success: false,
+        message: "Failed to generate verification token.",
+      });
     }
 
-    // 4) Prepare verification email
+    // 5. Build Email HTML
     const link = `${process.env.CLIENT_URL}/verify-email/${tokenString}`;
     const html = buildVerificationEmail(link);
 
     if (!html) {
-      throw new Error("Failed to build verification email.");
+      return res.status(500).json({
+        success: false,
+        message: "Failed to build verification email content.",
+      });
     }
 
-    // 5) Send the email
-    await transporter.sendMail({
-      from: "info@ofmbase.com",
-      to: email,
-      subject: "Verify Your Email",
-      html,
-    });
+    // 6. Send Email
+    try {
+      console.log("⏳ Sending verification email...");
+      await transporter.sendMail({
+        from: '"OFMBase" <info@ofmbase.com>',
+        to: email,
+        subject: "Verify Your Email",
+        html,
+      });
+      console.log("✅ Verification email sent.");
+    } catch (emailErr) {
+      console.error("❌ Email sending failed:", emailErr.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send verification email. Please try again later.",
+        error: emailErr.message,
+      });
+    }
 
-    // 6) Respond to client
+    // 7. Final Response
     return res.status(200).json({
       success: true,
       message: existing
@@ -118,7 +137,6 @@ export const registerUser = async (req, res) => {
     });
   } catch (err) {
     console.error("registerUser error:", err.message);
-
     return res.status(500).json({
       success: false,
       message: "Registration failed. Please try again later.",
