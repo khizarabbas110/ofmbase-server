@@ -9,7 +9,6 @@ import crypto from "crypto";
 import CreaterModal from "../models/creator.js";
 import employeeModel from "../models/employee.js";
 import RoleModel from "../models/role.js";
-import { transporter } from "../utils/transporter.js"; // Import the transporter from utils
 //
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Make sure this key is defined in your .env
@@ -41,106 +40,65 @@ export const registerUser = async (req, res) => {
   try {
     const { email, password, method } = req.body;
 
-    // 1. Basic Validation
-    if (!email || !password || !method) {
-      return res.status(400).json({
-        success: false,
-        message: "Email, password, and method are required.",
-      });
-    }
-
-    // 2. Check for Existing User
+    // 1) Check if there’s a verified user already
     const existing = await userModel.findOne({ email }).lean();
     if (existing?.isVerified) {
       return res.status(400).json({
         success: false,
-        message: "User already exists and is verified.",
+        message: "User already exists",
       });
     }
 
-    // 3. Create New or Reuse Unverified User
-    let user;
-    if (existing) {
-      user = existing;
-    } else {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user = await userModel.create({
-        email,
-        password: hashedPassword,
-        method,
-        isVerified: false,
-        ownerId: "Agency Owner itself",
-      });
-
-      if (!user) {
-        return res.status(500).json({
-          success: false,
-          message: "Failed to create new user.",
+    // 2) Either reuse the unverified user or create a fresh one
+    const user = existing
+      ? existing
+      : await userModel.create({
+          email,
+          password: await bcrypt.hash(password, 10),
+          method,
+          isVerified: false,
+          ownerId: "Agency Owner itself",
         });
-      }
-    }
 
-    // 4. Generate Verification Token
+    // 3) Generate & store a single-use token (overwriting any old one)
     const tokenString = crypto.randomBytes(32).toString("hex");
-    const tokenResult = await TokenModel.findOneAndUpdate(
+    await TokenModel.findOneAndUpdate(
       { userId: user._id },
       {
         token: tokenString,
-        expiresAt: Date.now() + 3600_000, // 1 hour
+        expiresAt: Date.now() + 3600_000, // 1h
       },
       { upsert: true, new: true }
     );
 
-    if (!tokenResult) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to generate verification token.",
-      });
-    }
-
-    // 5. Build Email HTML
+    // 4) Build the verification email once
     const link = `${process.env.CLIENT_URL}/verify-email/${tokenString}`;
     const html = buildVerificationEmail(link);
 
-    if (!html) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to build verification email content.",
-      });
-    }
-
-    // 6. Send Email
-    try {
-      console.log("⏳ Sending verification email...");
-      await transporter.sendMail({
-        from: '"OFMBase" <info@ofmbase.com>',
+    // 5) Kick off the email send but don’t await it
+    transporter
+      .sendMail({
+        from: "info@ofmbase.com",
         to: email,
         subject: "Verify Your Email",
         html,
+      })
+      .catch((err) => {
+        console.error("Failed to send verification email:", err);
       });
-      console.log("✅ Verification email sent.");
-    } catch (emailErr) {
-      console.error("❌ Email sending failed:", emailErr.message);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to send verification email. Please try again later.",
-        error: emailErr.message,
-      });
-    }
 
-    // 7. Final Response
-    return res.status(200).json({
+    // 6) Respond immediately
+    res.status(200).json({
       success: true,
       message: existing
         ? "Verification email resent. Please check your inbox."
         : "Registration successful. Please check your email to verify.",
     });
   } catch (err) {
-    console.error("registerUser error:", err.message);
-    return res.status(500).json({
+    console.error("registerUser error:", err);
+    res.status(500).json({
       success: false,
-      message: "Registration failed. Please try again later.",
-      error: err.message,
+      message: "Internal server error",
     });
   }
 };
@@ -332,6 +290,17 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+// Transporter for sending emails
+const transporter = nodemailer.createTransport({
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 export const forgotPassword = async (req, res) => {
   try {
