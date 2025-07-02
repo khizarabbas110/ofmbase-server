@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import os from "os";
 import fs from "fs";
 import { Server } from "socket.io";
-import https from "http"; // ✅ Instead of https
+import http from "http"; // ✅ Instead of https
 //
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -58,7 +58,7 @@ const sslOptions = {
 
 // App setup
 const app = express();
-const server = https.createServer(app); // ✅ Not https.createServer
+const server = http.createServer(app); // ✅ Not https.createServer
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
@@ -80,8 +80,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {});
 });
-
-const port = process.env.PORT || 4000;
 
 // Middlewares
 // Middlewares
@@ -143,6 +141,7 @@ const getLocalIPAddress = () => {
 const localIP = getLocalIPAddress();
 
 // Start HTTP server
-server.listen(443, "0.0.0.0", () => {
-  console.log("✅ HTTP server running on https://backend.ofmbase.com");
+const port = 4000;
+server.listen(port, "0.0.0.0", () => {
+  console.log(`✅ Node.js server running on http://localhost:${port}`);
 });
