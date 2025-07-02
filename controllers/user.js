@@ -76,7 +76,7 @@ export const registerUser = async (req, res) => {
     const html = buildVerificationEmail(link);
 
     // 5) Kick off the email send but don’t await it
-    transporter
+    await transporter
       .sendMail({
         from: "info@ofmbase.com",
         to: email,
