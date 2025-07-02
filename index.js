@@ -142,6 +142,6 @@ const localIP = getLocalIPAddress();
 
 // Start HTTP server
 const port = 4000;
-server.listen(443, "0.0.0.0", () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`✅ Node.js server running on http://localhost:${port}`);
 });
