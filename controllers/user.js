@@ -41,65 +41,88 @@ export const registerUser = async (req, res) => {
   try {
     const { email, password, method } = req.body;
 
-    // 1) Check if there’s a verified user already
+    // Basic validation
+    if (!email || !password || !method) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, password, and method are required.",
+      });
+    }
+
+    // 1) Check for an existing verified user
     const existing = await userModel.findOne({ email }).lean();
     if (existing?.isVerified) {
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "User already exists and is verified.",
       });
     }
 
-    // 2) Either reuse the unverified user or create a fresh one
-    const user = existing
-      ? existing
-      : await userModel.create({
-          email,
-          password: await bcrypt.hash(password, 10),
-          method,
-          isVerified: false,
-          ownerId: "Agency Owner itself",
-        });
+    // 2) Create a new user or reuse the unverified one
+    let user;
+    if (existing) {
+      user = existing;
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = await userModel.create({
+        email,
+        password: hashedPassword,
+        method,
+        isVerified: false,
+        ownerId: "Agency Owner itself",
+      });
 
-    // 3) Generate & store a single-use token (overwriting any old one)
+      if (!user) {
+        throw new Error("Failed to create new user.");
+      }
+    }
+
+    // 3) Generate a token
     const tokenString = crypto.randomBytes(32).toString("hex");
-    await TokenModel.findOneAndUpdate(
+
+    const tokenResult = await TokenModel.findOneAndUpdate(
       { userId: user._id },
       {
         token: tokenString,
-        expiresAt: Date.now() + 3600_000, // 1h
+        expiresAt: Date.now() + 3600_000, // 1 hour
       },
       { upsert: true, new: true }
     );
 
-    // 4) Build the verification email once
+    if (!tokenResult) {
+      throw new Error("Failed to generate or update verification token.");
+    }
+
+    // 4) Prepare verification email
     const link = `${process.env.CLIENT_URL}/verify-email/${tokenString}`;
     const html = buildVerificationEmail(link);
 
-    // 5) Kick off the email send but don’t await it
-    await transporter
-      .sendMail({
-        from: "info@ofmbase.com",
-        to: email,
-        subject: "Verify Your Email",
-        html,
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    if (!html) {
+      throw new Error("Failed to build verification email.");
+    }
 
-    // 6) Respond immediately
-    res.status(200).json({
+    // 5) Send the email
+    await transporter.sendMail({
+      from: "info@ofmbase.com",
+      to: email,
+      subject: "Verify Your Email",
+      html,
+    });
+
+    // 6) Respond to client
+    return res.status(200).json({
       success: true,
       message: existing
         ? "Verification email resent. Please check your inbox."
         : "Registration successful. Please check your email to verify.",
     });
   } catch (err) {
-    console.error("registerUser error:", err);
-    res.status(500).json({
+    console.error("registerUser error:", err.message);
+
+    return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Registration failed. Please try again later.",
+      error: err.message,
     });
   }
 };
