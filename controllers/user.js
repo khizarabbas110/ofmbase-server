@@ -293,12 +293,10 @@ export const loginUser = async (req, res) => {
 
 // Transporter for sending emails
 const transporter = nodemailer.createTransport({
-  host: "smtp.hostinger.com",
-  port: 465, // Use 587 if 465 doesn't work (465 is for SSL)
-  secure: true, // true for 465, false for 587
+  service: "gmail", // ✅ Gmail SMTP
   auth: {
-    user: "info@ofmbase.com",
-    pass: "Info123!!**",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
