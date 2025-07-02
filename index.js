@@ -143,5 +143,5 @@ const localIP = getLocalIPAddress();
 // Start HTTP server
 const port = 443;
 server.listen(4000, "127.0.0.1", () => {
-  console.log(`✅ Node.js server running on https://backend.ofmbase.com`);
+  console.log(`✅ Backend running securely at https://localhost:4000`);
 });
