@@ -9,6 +9,7 @@ import crypto from "crypto";
 import CreaterModal from "../models/creator.js";
 import employeeModel from "../models/employee.js";
 import RoleModel from "../models/role.js";
+import {transporter} from "../utils/transporter.js"; // Import the transporter from utils
 //
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Make sure this key is defined in your .env
