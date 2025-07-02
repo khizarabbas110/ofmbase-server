@@ -3,8 +3,10 @@ import userModel from "../models/user.js";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import { transporter } from "../utils/transporter.js";
+import { creatorCreated } from "../utils/emailTemplates.js";
 
 export const createCreator = async (req, res) => {
+  
   try {
     const { id } = req.params;
     const {
@@ -81,14 +83,18 @@ export const createCreator = async (req, res) => {
       ownerId: id,
       fullName: name,
     });
-
     await newUser.save();
-    transporter
+
+    const html = creatorCreated(name, newUser.email, password);
+
+    await transporter
       .sendMail({
         from: "info@ofmbase.com",
         to: newUser.email,
-        subject: "Welcome to the Creator Platform", // Subject line
-        text: `Hello ${newCreator.name},\n\nYour account has been successfully created as a Creator.\n\nYour login details are:\nEmail: ${newUser.email}\nPassword: ${password}\n\nPlease keep your password secure.\n\nBest Regards,\nThe Team`, // Email body
+        subject: "Welcome to the Creator Platform",
+        html,
+      })
+      .then(() => {
       })
       .catch((err) => {
         console.error("Failed to send verification email:", err);

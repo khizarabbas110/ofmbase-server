@@ -2,6 +2,7 @@ import employeeModel from "../models/employee.js";
 import bcrypt from "bcrypt";
 import userModel from "../models/user.js";
 import { transporter } from "../utils/transporter.js";
+import { EmployeeCreated } from "../utils/emailTemplates.js";
 
 export const createEmployee = async (req, res) => {
   try {
@@ -84,29 +85,19 @@ export const createEmployee = async (req, res) => {
     });
 
     await newUser.save();
+    const html = EmployeeCreated(name, newUser.email, password);
+
     await transporter
       .sendMail({
-        from: '"OFMBase" <info@ofmbase.com>',
+        from: "info@ofmbase.com",
         to: newUser.email,
         subject: "Welcome to the Creator Platform",
-        text: `Hello ${newEmployee.name},\n\nYour account has been successfully created as an Employee.\n\nYour login details are:\nEmail: ${newUser.email}\nPassword: ${password}\n\nPlease keep your password secure.\n\nBest Regards,\nThe Team`,
-        html: `
-        <p>Hello ${newEmployee.name},</p>
-        <p>Your account has been successfully created as an Employee.</p>
-        <p><strong>Login Details:</strong></p>
-        <ul>
-          <li><strong>Email:</strong> ${newUser.email}</li>
-          <li><strong>Password:</strong> ${password}</li>
-        </ul>
-        <p>Please keep your password secure.</p>
-        <p>Best Regards,<br/>The Team</p>
-      `,
+        html,
       })
-      .then((info) => {
-        console.log("✅ Email sent successfully:", info.response);
+      .then(() => {
       })
-      .catch((error) => {
-        console.error("❌ Failed to send email:", error);
+      .catch((err) => {
+        console.error("Failed to send verification email:", err);
       });
 
     // 7. Return the response
