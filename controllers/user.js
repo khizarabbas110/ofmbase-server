@@ -294,11 +294,11 @@ export const loginUser = async (req, res) => {
 // Transporter for sending emails
 const transporter = nodemailer.createTransport({
   host: "smtp.hostinger.com",
-  port: 465,
-  secure: true,
+  port: 465, // Use 587 if 465 doesn't work (465 is for SSL)
+  secure: true, // true for 465, false for 587
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: "info@ofmbase.com",
+    pass: "Info123!!**",
   },
 });
 
