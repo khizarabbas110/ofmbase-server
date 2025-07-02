@@ -44,17 +44,17 @@ import emailTemplateRouter from "./routes/emailTemplate.js";
 EventEmitter.defaultMaxListeners = 30;
 process.setMaxListeners(30);
 
-// const sslOptions = {
-//   key: fs.readFileSync("/etc/letsencrypt/live/backend.ofmbase.com/privkey.pem"),
-//   cert: fs.readFileSync(
-//     "/etc/letsencrypt/live/backend.ofmbase.com/fullchain.pem"
-//   ),
-// };
-
 const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, "certs", "key.pem")),
-  cert: fs.readFileSync(path.join(__dirname, "certs", "cert.pem")),
+  key: fs.readFileSync("/etc/letsencrypt/live/backend.ofmbase.com/privkey.pem"),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/backend.ofmbase.com/fullchain.pem"
+  ),
 };
+
+// const sslOptions = {
+//   key: fs.readFileSync(path.join(__dirname, "certs", "key.pem")),
+//   cert: fs.readFileSync(path.join(__dirname, "certs", "cert.pem")),
+// };
 
 // App setup
 const app = express();
@@ -144,5 +144,5 @@ const localIP = getLocalIPAddress();
 
 // Start HTTP server
 server.listen(5000, "0.0.0.0", () => {
-  console.log("✅ HTTP server running on http://localhost:5000");
+  console.log("✅ HTTP server running on https://backend.ofmbase.com");
 });
