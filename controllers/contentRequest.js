@@ -94,7 +94,7 @@ export const createContentRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -242,7 +242,7 @@ export const deleteRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -324,7 +324,8 @@ export const updateRequest = async (req, res) => {
     // 🔔 Emit notification via socket.io before sending response
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: existingCreator.email,
         subject: "Welcome to the Creator Platform", // Subject line
         text: `Hello ${
@@ -441,7 +442,8 @@ export const uploadContentToRequest = async (req, res) => {
 
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: existingUser.email,
         subject: `Content uploaded by ${existingCreator.name}`, // Subject line
         text: `Hello ${

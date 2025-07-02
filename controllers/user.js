@@ -78,7 +78,7 @@ export const registerUser = async (req, res) => {
     // 5) Kick off the email send but don’t await it
     await transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
         to: email,
         subject: "Verify Your Email",
         html,
@@ -325,7 +325,8 @@ export const forgotPassword = async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: "info@ofmbase.com",
+      from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
       to: user.email,
       subject: "Password Reset Request",
       html: `

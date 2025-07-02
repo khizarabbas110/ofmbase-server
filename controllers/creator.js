@@ -6,7 +6,6 @@ import { transporter } from "../utils/transporter.js";
 import { creatorCreated } from "../utils/emailTemplates.js";
 
 export const createCreator = async (req, res) => {
-  
   try {
     const { id } = req.params;
     const {
@@ -89,13 +88,13 @@ export const createCreator = async (req, res) => {
 
     await transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: newUser.email,
         subject: "Welcome to the Creator Platform",
         html,
       })
-      .then(() => {
-      })
+      .then(() => {})
       .catch((err) => {
         console.error("Failed to send verification email:", err);
       });

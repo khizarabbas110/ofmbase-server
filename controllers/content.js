@@ -70,7 +70,7 @@ export const CreateAndUploadContent = async (req, res) => {
     if (existingCreator) {
       transporter
         .sendMail({
-          from: "info@ofmbase.com",
+          from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
           to: existingUser.email,
           subject: `Content uploaded by ${existingCreator.name}`, // Subject line
           text: `Hello ${

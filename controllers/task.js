@@ -38,7 +38,8 @@ export const createTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: existingEmployee.email,
         subject: "New Task Assigned", // Subject line
         text: `Hello ${
@@ -145,7 +146,8 @@ export const updateTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: existingEmployee.email,
         subject: "Task Updated", // Subject line
         text: `Hello ${
@@ -204,7 +206,8 @@ export const deleteTask = async (req, res) => {
     }
     transporter
       .sendMail({
-        from: "info@ofmbase.com",
+        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+
         to: existingEmployee.email,
         subject: "A Task removed", // Subject line
         text: `Hello ${
