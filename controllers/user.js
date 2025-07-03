@@ -4,6 +4,7 @@ import packageModal from "../models/subscriptions.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { transporter } from "../utils/transporter.js"; // Import the transporter from your email config
 import TokenModel from "../models/Token.js";
 import crypto from "crypto";
 import CreaterModal from "../models/creator.js";
@@ -292,13 +293,6 @@ export const loginUser = async (req, res) => {
 };
 
 // Transporter for sending emails
-const transporter = nodemailer.createTransport({
-  service: "gmail", // ✅ Gmail SMTP
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 export const forgotPassword = async (req, res) => {
   try {
