@@ -1,12 +1,22 @@
-import nodemailer from "nodemailer";
+// emailService.js
+import { Resend } from "resend";
 import "dotenv/config";
 
-export const transporter = nodemailer.createTransport({
-  host: "smtp.hostinger.com", // ✅ Hostinger SMTP server
-  port: 465, // ✅ SSL port
-  secure: true, // ✅ Use SSL
-  auth: {
-    user: process.env.EMAIL_USER, // info@ofmbase.com
-    pass: process.env.EMAIL_PASS, // Info123!!**
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export const sendVerificationEmail = async (toEmail, htmlContent, emailSubject) => {
+  try {
+    const response = await resend.emails.send({
+      from: "OFMBase <info@ofmbase.com>",
+      to: toEmail,
+      subject: emailSubject,
+      html: htmlContent,
+    });
+
+    console.log("✅ Email sent via Resend:", response);
+    return response;
+  } catch (err) {
+    console.error("❌ Failed to send email via Resend:", err);
+    throw err;
+  }
+};

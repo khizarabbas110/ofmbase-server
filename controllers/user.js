@@ -4,7 +4,7 @@ import packageModal from "../models/subscriptions.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import { transporter } from "../utils/transporter.js"; // Import the transporter from your email config
+import { sendVerificationEmail, transporter } from "../utils/transporter.js"; // Import the transporter from your email config
 import TokenModel from "../models/Token.js";
 import crypto from "crypto";
 import CreaterModal from "../models/creator.js";
@@ -77,16 +77,7 @@ export const registerUser = async (req, res) => {
     const html = buildVerificationEmail(link);
 
     // 5) Kick off the email send but don’t await it
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
-        to: email,
-        subject: "Verify Your Email",
-        html,
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    await sendVerificationEmail(email, html, "Verify Your Email");
 
     // 6) Respond immediately
     res.status(200).json({
