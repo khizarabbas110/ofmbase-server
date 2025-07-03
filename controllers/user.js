@@ -4,7 +4,7 @@ import packageModal from "../models/subscriptions.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import { sendVerificationEmail, transporter } from "../utils/transporter.js"; // Import the transporter from your email config
+import { sendVerificationEmail } from "../utils/transporter.js"; // Import the transporter from your email config
 import TokenModel from "../models/Token.js";
 import crypto from "crypto";
 import CreaterModal from "../models/creator.js";

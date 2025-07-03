@@ -1,5 +1,4 @@
 import TaskModel from "../models/task.js";
-import { transporter } from "../utils/transporter.js";
 import employeeModel from "../models/employee.js";
 import userModel from "../models/user.js";
 import notificationModal from "../models/notifications.js";
@@ -36,19 +35,15 @@ export const createTask = async (req, res) => {
     if (!existingEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+    const htmlContent = `Hello ${
+      existingEmployee.name ? existingEmployee.name : "there,"
+    },\n\nYou have received a new Task`; // Email body
 
-        to: existingEmployee.email,
-        subject: "New Task Assigned", // Subject line
-        text: `Hello ${
-          existingEmployee.name ? existingEmployee.name : "there,"
-        },\n\nYou have received a new Task`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    await sendVerificationEmail(
+      existingEmployee.email,
+      htmlContent,
+      "New Task Assigned"
+    );
     //
     req.io.emit("notification", {
       type: "tasks",
@@ -144,19 +139,16 @@ export const updateTask = async (req, res) => {
     if (!existingEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
 
-        to: existingEmployee.email,
-        subject: "Task Updated", // Subject line
-        text: `Hello ${
-          existingEmployee.name ? existingEmployee.name : "there,"
-        },\n\nYour task has been updated`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    const htmlContent = `Hello ${
+      existingEmployee.name ? existingEmployee.name : "there,"
+    },\n\nYour task has been updated`; // Email body
+
+    await sendVerificationEmail(
+      existingEmployee.email,
+      htmlContent,
+      "Task Updated"
+    );
     //
     req.io.emit("notification", {
       type: "tasks",
@@ -204,19 +196,16 @@ export const deleteTask = async (req, res) => {
     if (!existingEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
 
-        to: existingEmployee.email,
-        subject: "A Task removed", // Subject line
-        text: `Hello ${
-          existingEmployee.name ? existingEmployee.name : "there,"
-        },\n\nYour task has been removed`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    const htmlContent = `Hello ${
+      existingEmployee.name ? existingEmployee.name : "there,"
+    },\n\nYour task has been removed`; // Email body
+
+    await sendVerificationEmail(
+      existingEmployee.email,
+      htmlContent,
+      "A Task removed"
+    );
     //
     req.io.emit("notification", {
       type: "tasks",

@@ -1,7 +1,7 @@
 import employeeModel from "../models/employee.js";
 import bcrypt from "bcrypt";
 import userModel from "../models/user.js";
-import { transporter } from "../utils/transporter.js";
+import { sendVerificationEmail } from "../utils/transporter.js";
 import { EmployeeCreated } from "../utils/emailTemplates.js";
 
 export const createEmployee = async (req, res) => {
@@ -87,18 +87,11 @@ export const createEmployee = async (req, res) => {
     await newUser.save();
     const html = EmployeeCreated(name, newUser.email, password);
 
-    await transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
-
-        to: newUser.email,
-        subject: "Welcome to the Creator Platform",
-        html,
-      })
-      .then(() => {})
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    await sendVerificationEmail(
+      newUser.email,
+      html,
+      "Welcome to the Creator Platform"
+    );
 
     // 7. Return the response
     return res.status(201).json({

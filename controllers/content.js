@@ -4,7 +4,7 @@ import path from "path";
 import sendContentModal from "../models/content.js";
 import userModel from "../models/user.js";
 import CreaterModal from "../models/creator.js";
-import { transporter } from "../utils/transporter.js";
+import { sendVerificationEmail } from "../utils/transporter.js";
 import notificationModal from "../models/notifications.js";
 
 // AWS SDK v3 S3 client config
@@ -68,18 +68,14 @@ export const CreateAndUploadContent = async (req, res) => {
     const existingCreator = await CreaterModal.findOne({ _id: creatorId });
 
     if (existingCreator) {
-      transporter
-        .sendMail({
-          from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
-          to: existingUser.email,
-          subject: `Content uploaded by ${existingCreator.name}`, // Subject line
-          text: `Hello ${
-            existingUser.fullName ? existingUser.fullName : "there,"
-          },\n\nContent has been uploaded by ${existingCreator.name}`, // Email body
-        })
-        .catch((err) => {
-          console.error("Failed to send verification email:", err);
-        });
+      const htmlContent = `Hello ${
+        existingUser.fullName ? existingUser.fullName : "there,"
+      },\n\nContent has been uploaded by ${existingCreator.name}`; // Email body
+      await sendVerificationEmail(
+        existingUser.email,
+        htmlContent,
+        `Content uploaded by ${existingCreator.name}`
+      );
       //
       req.io.emit("notification", {
         type: "content-request-uploaded",

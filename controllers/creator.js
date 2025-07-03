@@ -2,7 +2,7 @@ import Creator from "../models/creator.js";
 import userModel from "../models/user.js";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
-import { transporter } from "../utils/transporter.js";
+import { sendVerificationEmail } from "../utils/transporter.js";
 import { creatorCreated } from "../utils/emailTemplates.js";
 
 export const createCreator = async (req, res) => {
@@ -86,18 +86,8 @@ export const createCreator = async (req, res) => {
 
     const html = creatorCreated(name, newUser.email, password);
 
-    await transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+    await sendVerificationEmail(newUser.email, html, "Welcome to the Creator Platform");
 
-        to: newUser.email,
-        subject: "Welcome to the Creator Platform",
-        html,
-      })
-      .then(() => {})
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
     // 7. Return the response
     return res.status(201).json({
       message: "Creator created successfully",

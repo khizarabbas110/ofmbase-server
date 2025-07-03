@@ -5,7 +5,7 @@ import path from "path";
 import notificationModal from "../models/notifications.js";
 import CreaterModal from "../models/creator.js";
 import userModel from "../models/user.js";
-import { transporter } from "../utils/transporter.js";
+import { sendVerificationEmail } from "../utils/transporter.js";
 
 // AWS SDK v3 S3 client config
 const s3Client = new S3Client({
@@ -92,18 +92,15 @@ export const createContentRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
     // 🔔 Emit notification via socket.io before sending response
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
-        to: existingCreator.email,
-        subject: "Welcome to the Creator Platform", // Subject line
-        text: `Hello ${
-          existingCreator.name ? existingCreator.name : "there,"
-        },\n\nYou have received a new content request.`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    const htmlContent = `Hello ${
+      existingCreator.name ? existingCreator.name : "there,"
+    },\n\nYou have received a new content request.`; // Email body
+
+    await sendVerificationEmail(
+      existingCreator.email,
+      htmlContent,
+      "Welcome to the Creator Platform"
+    );
     //
     if (title) {
       req.io.emit("notification", {
@@ -240,19 +237,16 @@ export const deleteRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
     // 🔔 Emit notification via socket.io before sending response
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
-        to: existingCreator.email,
-        subject: "Welcome to the Creator Platform", // Subject line
-        text: `Hello ${
-          existingCreator.name ? existingCreator.name : "there,"
-        },\n\nContent Request has been removed`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
-    //
+
+    const htmlContent = `Hello ${
+      existingCreator.name ? existingCreator.name : "there,"
+    },\n\nContent Request has been removed`; // Email body
+
+    await sendVerificationEmail(
+      existingCreator.email,
+      htmlContent,
+      "Welcome to the Creator Platform"
+    ); //
     if (request.title) {
       req.io.emit("notification", {
         type: "content-request",
@@ -322,19 +316,16 @@ export const updateRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
     // 🔔 Emit notification via socket.io before sending response
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+    const htmlContent = `Hello ${
+      existingCreator.name ? existingCreator.name : "there,"
+    },\n\nContent Request has been Updated`; // Email body
 
-        to: existingCreator.email,
-        subject: "Welcome to the Creator Platform", // Subject line
-        text: `Hello ${
-          existingCreator.name ? existingCreator.name : "there,"
-        },\n\nContent Request has been Updated`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    await sendVerificationEmail(
+      existingCreator.email,
+      htmlContent,
+      "Welcome to the Creator Platform"
+    );
+
     //
     if (request.title) {
       req.io.emit("notification", {
@@ -440,19 +431,15 @@ export const uploadContentToRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
 
-    transporter
-      .sendMail({
-        from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
+    const htmlContent = `Hello ${
+      existingUser.fullName ? existingUser.fullName : "there,"
+    },\n\nContent has been uploaded by ${updatedRequest.name}`; // Email body
 
-        to: existingUser.email,
-        subject: `Content uploaded by ${existingCreator.name}`, // Subject line
-        text: `Hello ${
-          existingUser.fullName ? existingUser.fullName : "there,"
-        },\n\nContent has been uploaded by ${updatedRequest.name}`, // Email body
-      })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+    await sendVerificationEmail(
+      existingUser.email,
+      htmlContent,
+      "Content uploaded by ${existingCreator.name}"
+    );
     //
     req.io.emit("notification", {
       type: "content-request-uploaded",
