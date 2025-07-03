@@ -77,16 +77,15 @@ export const registerUser = async (req, res) => {
     const html = buildVerificationEmail(link);
 
     // 5) Kick off the email send but don’t await it
-    await transporter
+    transporter
       .sendMail({
-        from: `"OFMBase" <${process.env.EMAIL_USER}>`, // ✅ Use your verified Gmail
-        to: email,
-        subject: "Verify Your Email",
-        html,
+        from: `"Test" <${process.env.EMAIL_USER}>`,
+        to: "khizarnot7@gmail.com",
+        subject: "Testing",
+        html: "<p>This is a test email</p>",
       })
-      .catch((err) => {
-        console.error("Failed to send verification email:", err);
-      });
+      .then(() => console.log("Test email sent"))
+      .catch((err) => console.error("Test email failed:", err));    
 
     // 6) Respond immediately
     res.status(200).json({
