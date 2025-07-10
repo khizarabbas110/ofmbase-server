@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import { sendVerificationEmail } from "../utils/transporter.js";
 import { creatorCreated } from "../utils/emailTemplates.js";
+import subscriptionsModal from "../models/subscriptions.js";
 
 export const createCreator = async (req, res) => {
   try {
@@ -28,14 +29,12 @@ export const createCreator = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    const packageLimits = {};
 
-    const packageLimits = {
-      Free: 1,
-      Starter: 3,
-      Professional: 7,
-      Enterprise: 15,
-    };
-
+    const packagesList = await subscriptionsModal.find();
+    packagesList.forEach((pkg) => {
+      packageLimits[pkg.name] = pkg.creators;
+    });
     const userPackage = user.subscribedPackage || "Free"; // Default to "Free"
     const maxCreatorsAllowed = packageLimits[userPackage] ?? 1;
 
@@ -86,7 +85,11 @@ export const createCreator = async (req, res) => {
 
     const html = creatorCreated(name, newUser.email, password);
 
-    await sendVerificationEmail(newUser.email, html, "Welcome to the Creator Platform");
+    await sendVerificationEmail(
+      newUser.email,
+      html,
+      "Welcome to the Creator Platform"
+    );
 
     // 7. Return the response
     return res.status(201).json({

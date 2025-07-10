@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import userModel from "../models/user.js";
 import { sendVerificationEmail } from "../utils/transporter.js";
 import { EmployeeCreated } from "../utils/emailTemplates.js";
+import subscriptionsModal from "../models/subscriptions.js";
 
 export const createEmployee = async (req, res) => {
   try {
@@ -28,12 +29,12 @@ export const createEmployee = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const packageLimits = {
-      Free: 3,
-      Starter: 6,
-      Professional: 15,
-      Enterprise: 40,
-    };
+    const packageLimits = {};
+
+    const packagesList = await subscriptionsModal.find();
+    packagesList.forEach((pkg) => {
+      packageLimits[pkg.name] = pkg.employees;
+    });
 
     const userPackage = user.subscribedPackage;
     const maxCreatorsAllowed = packageLimits[userPackage] ?? 3;

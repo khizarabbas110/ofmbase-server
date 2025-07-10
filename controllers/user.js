@@ -660,7 +660,16 @@ export const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
     const user = await userModel.findByIdAndDelete(id);
+    const existingCreator = await CreaterModal.findOneAndDelete({
+      email: user.email,
+    });
+    const existingEmployee = await employeeModel.findOneAndDelete({
+      email: user.email,
+    });
     if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!existingCreator && !existingEmployee) {
       return res.status(404).json({ message: "User not found" });
     }
     return res.status(200).json({ message: "User deleted successfully" });
