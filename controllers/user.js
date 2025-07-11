@@ -12,6 +12,7 @@ import employeeModel from "../models/employee.js";
 import RoleModel from "../models/role.js";
 //
 import Stripe from "stripe";
+import { resetPasswordEmailTemplaet } from "../utils/emailTemplates.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Make sure this key is defined in your .env
 
 dotenv.config(); // Load environment variables
@@ -307,70 +308,12 @@ export const forgotPassword = async (req, res) => {
 
     // Reset link
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+    //df
+    // 4) Build the verification email once
+    const html = resetPasswordEmailTemplaet(resetLink);
 
-    // Email content
-    const mailOptions = {
-      from: `"OFMBase" <${process.env.SMTP_USER}>`, // ✅ Use your verified Gmail
-
-      to: user.email,
-      subject: "Password Reset Request",
-      html: `
-<!DOCTYPE html>
-    <html>
-      <head>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-            text-align: center;
-          }
-          .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: auto;
-          }
-          h3 {
-            color: #333;
-          }
-          p {
-            color: #555;
-          }
-          .button {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            font-size: 16px;
-            border-radius: 5px;
-            margin-top: 20px;
-          }
-          .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h3>Password Reset Request</h3>
-          <p>Click the button below to reset your password:</p>
-          <a href="${resetLink}" class="button">Reset Password</a>
-          <p>If you didn't request this, please ignore this email.</p>
-          <p class="footer">This link will expire in 1 hour.</p>
-        </div>
-      </body>
-    </html>
-      `,
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
+    // 5) Kick off the email send but don’t await it
+    await sendVerificationEmail(user.email, html, "Reset Your Password");
 
     res.status(200).json({ message: "Password reset link sent to your email" });
   } catch (error) {
@@ -396,7 +339,7 @@ export const resetPassword = async (req, res) => {
     const tokenEntry = await TokenModel.findOne({ token });
     if (!tokenEntry) {
       return res.status(400).json({
-        message: "Invalid or expired token. Please request a new one.",
+        message: "Invalid or expired session. Please request a new one.",
       });
     }
 
