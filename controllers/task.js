@@ -2,6 +2,7 @@ import TaskModel from "../models/task.js";
 import employeeModel from "../models/employee.js";
 import userModel from "../models/user.js";
 import notificationModal from "../models/notifications.js";
+import { sendVerificationEmail } from "../utils/transporter.js";
 
 export const createTask = async (req, res) => {
   try {
