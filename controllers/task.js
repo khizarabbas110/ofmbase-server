@@ -3,6 +3,7 @@ import employeeModel from "../models/employee.js";
 import userModel from "../models/user.js";
 import notificationModal from "../models/notifications.js";
 import { sendVerificationEmail } from "../utils/transporter.js";
+import EmailTemplateModal from "../models/emailTemplate.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -36,14 +37,21 @@ export const createTask = async (req, res) => {
     if (!existingEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    const htmlContent = `Hello ${
-      existingEmployee.name ? existingEmployee.name : "there,"
-    },\n\nYou have received a new Task`; // Email body
+    const template = await EmailTemplateModal.findOne({
+      templatePurpose: "task-assigned",
+    });
+    if (!template) {
+      return res
+        .status(500)
+        .json({ message: "Task Assigned Email Template Not Found" });
+    }
+
+    const htmlContent = template.htmlContent;
 
     await sendVerificationEmail(
       existingEmployee.email,
       htmlContent,
-      "New Task Assigned"
+      template.subject
     );
     //
     req.io.emit("notification", {
@@ -140,15 +148,26 @@ export const updateTask = async (req, res) => {
     if (!existingEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
+    //
+    const template = await EmailTemplateModal.findOne({
+      templatePurpose: "task-updated",
+    });
+    if (!template) {
+      res.status(500).json({ message: "Task Update Email Template Not Found" });
+    }
 
-    const htmlContent = `Hello ${
-      existingEmployee.name ? existingEmployee.name : "there,"
-    },\n\nYour task has been updated`; // Email body
+    const htmlContent = template.htmlContent;
+    const agencyOwner = await userModel.findById({ _id: employee.ownerId });
 
     await sendVerificationEmail(
       existingEmployee.email,
       htmlContent,
-      "Task Updated"
+      template.subject
+    );
+    await sendVerificationEmail(
+      agencyOwner.email,
+      htmlContent,
+      template.subject
     );
     //
     req.io.emit("notification", {
@@ -170,7 +189,6 @@ export const updateTask = async (req, res) => {
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
     }
-
     res.status(200).json(updatedTask);
   } catch (error) {
     console.log(error);
@@ -198,14 +216,21 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    const htmlContent = `Hello ${
-      existingEmployee.name ? existingEmployee.name : "there,"
-    },\n\nYour task has been removed`; // Email body
+    const template = await EmailTemplateModal.findOne({
+      templatePurpose: "task-deleted",
+    });
+    if (!template) {
+      res
+        .status(500)
+        .json({ message: "Task Deleted Email Template Not Found" });
+    }
+
+    const htmlContent = template.htmlContent;
 
     await sendVerificationEmail(
       existingEmployee.email,
       htmlContent,
-      "A Task removed"
+      template.subject
     );
     //
     req.io.emit("notification", {

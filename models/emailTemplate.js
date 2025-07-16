@@ -22,6 +22,10 @@ const emailTemplateSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    templatePurpose: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true } // Adds createdAt and updatedAt
 );

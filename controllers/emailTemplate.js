@@ -2,7 +2,8 @@ import EmailTemplateModal from "../models/emailTemplate.js";
 
 export const createEmailTemplate = async (req, res) => {
   try {
-    const { name, subject, content, htmlContent, useHtml } = req.body;
+    const { name, subject, content, htmlContent, useHtml, templatePurpose } =
+      req.body;
 
     // Basic validation
     if (!name || !subject) {
@@ -18,6 +19,7 @@ export const createEmailTemplate = async (req, res) => {
       content,
       htmlContent,
       useHtml,
+      templatePurpose,
     });
 
     const savedTemplate = await newTemplate.save();

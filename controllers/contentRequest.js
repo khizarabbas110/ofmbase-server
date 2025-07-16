@@ -2,6 +2,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import contentRequestModal from "../models/contentRequest.js";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
+import EmailTemplateModal from "../models/emailTemplate.js";
 import notificationModal from "../models/notifications.js";
 import CreaterModal from "../models/creator.js";
 import userModel from "../models/user.js";
@@ -92,14 +93,21 @@ export const createContentRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
     // 🔔 Emit notification via socket.io before sending response
-    const htmlContent = `Hello ${
-      existingCreator.name ? existingCreator.name : "there,"
-    },\n\nYou have received a new content request.`; // Email body
+    const template = await EmailTemplateModal.findOne({
+      templatePurpose: "content-request-created",
+    });
+    if (!template) {
+      res.status(500).json({
+        message: "Content Request Created Email Template Not Found",
+      });
+    }
+
+    const htmlContent = template.htmlContent;
 
     await sendVerificationEmail(
       existingCreator.email,
       htmlContent,
-      "Welcome to the Creator Platform"
+      template.subject
     );
     //
     if (title) {
@@ -431,15 +439,16 @@ export const uploadContentToRequest = async (req, res) => {
       return res.status(404).json({ message: "Creator not found" });
     }
 
-    const htmlContent = `Hello ${
-      existingUser.fullName ? existingUser.fullName : "there,"
-    },\n\nContent has been uploaded by ${updatedRequest.name}`; // Email body
+    const template = await EmailTemplateModal.findOne({
+      templatePurpose: "content-uploaded",
+    });
+    if (!template) {
+      res.status(500).json({ message: "Task Update Email Template Not Found" });
+    }
 
-    await sendVerificationEmail(
-      existingUser.email,
-      htmlContent,
-      "Content uploaded by ${existingCreator.name}"
-    );
+    const htmlContent = template.htmlContent;
+
+    await sendVerificationEmail(existingUser.email, htmlContent, template.subject);
     //
     req.io.emit("notification", {
       type: "content-request-uploaded",
