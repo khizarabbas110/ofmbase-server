@@ -39,6 +39,7 @@ import adminRouter from "./routes/admin.js";
 import subscriptionsRouter from "./routes/subscriptions.js";
 import adminDocumentRouter from "./routes/adminDocuments.js";
 import emailTemplateRouter from "./routes/emailTemplate.js";
+import companyInfoRouter from "./routes/companyInfo.js";
 
 // Raise the max listeners limit
 EventEmitter.defaultMaxListeners = 30;
@@ -125,6 +126,8 @@ app.use("/api/subscriptions", subscriptionsRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/admin/documents", adminDocumentRouter);
 app.use("/api/admin/templates", emailTemplateRouter);
+// company info routes
+app.use("/api/company-info", companyInfoRouter);
 
 // Helper to get local IP
 const getLocalIPAddress = () => {
