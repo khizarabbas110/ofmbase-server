@@ -1,6 +1,5 @@
 import ReceiptModal from "../models/receipts.js"; // adjust path as needed
 
-
 export const createReceipt = async (req, res) => {
   try {
     const {
@@ -14,13 +13,20 @@ export const createReceipt = async (req, res) => {
       paypal,
       notes,
       ownerId,
-      amount
+      amount,
     } = req.body;
+
+    // ✅ Map incoming items to match ItemSchema
+    const mappedItems = items.map((item) => ({
+      name: item.description || item.name || "", // fallback if either field exists
+      price: Number(item.amount || item.price || 0),
+      quantity: item.quantity ? Number(item.quantity) : 1, // default to 1 if not provided
+    }));
 
     const newInvoice = new ReceiptModal({
       date,
       number,
-      items,
+      items: mappedItems,
       paymentMethod,
       cash,
       bankTransfer,
@@ -28,7 +34,7 @@ export const createReceipt = async (req, res) => {
       paypal,
       notes,
       ownerId,
-      amount
+      amount,
     });
 
     const savedInvoice = await newInvoice.save();
