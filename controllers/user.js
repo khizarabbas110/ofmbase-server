@@ -40,7 +40,9 @@ dotenv.config(); // Load environment variables
 //User Registration
 export const registerUser = async (req, res) => {
   try {
-    const { email, password, method } = req.body;
+    const email = req.body.email.toLowerCase();
+
+    const { password, method } = req.body;
 
     // 1) Check if there’s a verified user already
     const existing = await userModel.findOne({ email }).lean();
