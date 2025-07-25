@@ -13,6 +13,9 @@ export const createInvoice = async (req, res) => {
       bankInfo,
       amount,
       ownerId,
+      customerName,
+      customerContact,
+      customerAddress,
     } = req.body;
 
     // Check if invoice number already exists
@@ -33,6 +36,9 @@ export const createInvoice = async (req, res) => {
       bankInfo,
       amount,
       ownerId,
+      customerName,
+      customerContact,
+      customerAddress,
     });
 
     const savedInvoice = await invoice.save();

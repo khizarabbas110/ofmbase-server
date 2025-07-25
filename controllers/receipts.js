@@ -14,8 +14,12 @@ export const createReceipt = async (req, res) => {
       notes,
       ownerId,
       amount,
+      customerName,
+      customerContact,
+      customerAddress
     } = req.body;
-
+    console.log(customerName, customerContact, customerAddress);
+    
     // ✅ Map incoming items to match ItemSchema
     const mappedItems = items.map((item) => ({
       name: item.description || item.name || "", // fallback if either field exists
@@ -35,6 +39,9 @@ export const createReceipt = async (req, res) => {
       notes,
       ownerId,
       amount,
+      customerName,
+      customerContact,
+      customerAddress,
     });
 
     const savedInvoice = await newInvoice.save();

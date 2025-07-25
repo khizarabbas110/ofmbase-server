@@ -47,6 +47,18 @@ const invoiceSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    customerName: {
+      type: String,
+      required: true,
+    },
+    customerContact: {
+      type: String,
+      required: true,
+    },
+    customerAddress: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

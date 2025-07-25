@@ -77,6 +77,18 @@ const InvoiceSchema = new mongoose.Schema({
     required: false,
     default: 0, // defined modulelarly
   },
+  customerName: {
+    type: String,
+    required: true,
+  },
+  customerContact: {
+    type: String,
+    required: true,
+  },
+  customerAddress: {
+    type: String,
+    required: true,
+  },
 });
 
 export default mongoose.models.Receipts ||
